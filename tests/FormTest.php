@@ -159,9 +159,13 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->hasErrors());
         $this->assertEquals(['a' => ['error2', 'error'], 'c' => ['error']], $form->getErrors());
         $this->assertEquals(['a' => 'error2', 'c' => 'error'], $form->getFirstErrors());
+        $this->assertEquals('error2', $form->getFirstError('a'));
         $this->assertEquals(['error2', 'error'], $form->getErrors('a'));
         $this->assertTrue($form->hasErrors('c'));
         $this->assertFalse($form->hasErrors('b'));
+        $form->resetErrors('c');
+        $this->assertTrue($form->hasErrors('a'));
+        $this->assertFalse($form->hasErrors('c'));
 
         $form->setData(['a' => 3, 'b' => 3, 'c' => 5]);
         $this->assertTrue($form->validate());

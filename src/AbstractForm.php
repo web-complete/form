@@ -201,7 +201,7 @@ abstract class AbstractForm
     public function getFirstError($field)
     {
         return isset($this->errors[$field]) && $this->errors[$field]
-            ? reset($this->errors)
+            ? reset($this->errors[$field])
             : null;
     }
 
