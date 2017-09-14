@@ -13,7 +13,7 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $form = new FastForm();
         $this->assertInstanceOf(\WebComplete\form\AbstractForm::class, $form);
 
-        $form = new FastForm([], [], new Validators(), new Filters());
+        $form = new FastForm(null, null, new Validators(), new Filters());
         $this->assertInstanceOf(\WebComplete\form\AbstractForm::class, $form);
     }
 
