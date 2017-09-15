@@ -20,4 +20,9 @@
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="coverage-html" target="tests/coverage"/>
+        <log type="junit" target="tests/logs/junit.xml" logIncompleteSkipped="false"/>
+    </logging>
 </phpunit>

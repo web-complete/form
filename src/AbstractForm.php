@@ -6,6 +6,8 @@ namespace WebComplete\form;
 abstract class AbstractForm
 {
 
+    const REQUIRED = 'required';
+
     protected $data = [];
     protected $errors = [];
     protected $defaultError = 'error';
@@ -101,8 +103,18 @@ abstract class AbstractForm
                     $defName = array_shift($definition);
                     $defParams = array_merge([$value], [array_shift($definition)], [$this]);
                     $defMessage = array_shift($definition) ?: $this->defaultError;
-                    if(!$this->call($defName, $defParams, $this->validatorsObject, true)) {
-                        $this->addError($field, $defMessage);
+
+                    if($defName == self::REQUIRED) {
+                        if($this->isEmpty($value)) {
+                            $this->addError($field, $defMessage);
+                        }
+                    }
+                    else {
+                        if(!$this->isEmpty($value)) {
+                            if(!$this->call($defName, $defParams, $this->validatorsObject, true)) {
+                                $this->addError($field, $defMessage);
+                            }
+                        }
                     }
                 }
             }
@@ -257,6 +269,16 @@ abstract class AbstractForm
         }
 
         return $data;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    protected function isEmpty($value)
+    {
+        return $value === null || $value == '' || (is_array($value) && !count($value));
     }
 
     /**

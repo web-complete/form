@@ -2,8 +2,9 @@
 
 use WebComplete\form\FastForm;
 
-include 'include/Filters.php';
-include 'include/Validators.php';
+require_once 'include/MyForm.php';
+require_once 'include/Filters.php';
+require_once 'include/Validators.php';
 
 class FormTest extends \PHPUnit\Framework\TestCase
 {
