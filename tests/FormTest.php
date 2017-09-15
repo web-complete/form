@@ -133,13 +133,77 @@ class FormTest extends \PHPUnit\Framework\TestCase
                 [['a', 'b', 'c'], 'validateString', ['minLength' => 3]],
             ],
             [
-                ['*', 'trim', ' ']
+                ['*', 'trim']
             ]
+            , null, new Filters()
         );
 
         $form->setData(['a' => 'aa ', 'b' => 'bbb ', 'c' => 'cccc ']);
         $this->assertFalse($form->validate());
         $this->assertEquals(['a' => 'aa', 'b' => 'bbb', 'c' => 'cccc'], $form->getData());
+    }
+
+    public function testSetValue()
+    {
+        $form = new FastForm(
+            [['a']],
+            [['a', 'trim']],
+            null, new Filters()
+        );
+        $form->setData(['a' => 'aa ']);
+        $this->assertEquals('aa', $form->getValue('a'));
+        $form->setValue('a', 'bb ');
+        $this->assertEquals('bb', $form->getValue('a'));
+        $form->setValue('a', 'cc ', false);
+        $this->assertEquals('cc ', $form->getValue('a'));
+    }
+
+    public function testValidatorRepeatPassword()
+    {
+        $form = new FastForm(
+            [
+                [['p'],], // safe fields
+                [['pr'], 'repeatPassword', ['field' => 'p']], // safe fields
+            ],
+            [
+            ],
+            new Validators()
+        );
+        $form->setData(['p' => 'qwe', 'pr' => 'qw']);
+        $this->assertFalse($form->validate());
+        $form->setValue('pr', 'qwe');
+        $this->assertTrue($form->validate());
+    }
+
+    public function testCallableNotFoundFilter()
+    {
+        $this->expectException(\WebComplete\form\FormException::class);
+        $this->expectExceptionMessage('Callable not found: "asd"');
+
+        $form = new FastForm(
+            [
+            ],
+            [
+                [['a'], 'asd'],
+            ]
+        );
+        $form->setData(['a' => 'aaa']);
+    }
+
+    public function testCallableNotFoundValidator()
+    {
+        $this->expectException(\WebComplete\form\FormException::class);
+        $this->expectExceptionMessage('Callable not found: "qwe"');
+
+        $form = new FastForm(
+            [
+                [['a'], 'qwe'],
+            ],
+            [
+            ]
+        );
+        $form->setData(['a' => 'aaa']);
+        $form->validate();
     }
 
     public function testErrors()

@@ -18,4 +18,9 @@ class Filters
         return $value;
     }
 
+    public function trim($value, $params)
+    {
+        return trim($value);
+    }
+
 }

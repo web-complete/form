@@ -1,5 +1,7 @@
 <?php
 
+use WebComplete\form\AbstractForm;
+
 class Validators
 {
 
@@ -18,6 +20,19 @@ class Validators
             }
         }
         return true;
+    }
+
+    /**
+     * @param $value
+     * @param $params
+     * @param AbstractForm $form
+     * - field
+     *
+     * @return bool
+     */
+    public function repeatPassword($value, $params, AbstractForm $form)
+    {
+        return $value == $form->getValue($params['field']);
     }
 
 }
