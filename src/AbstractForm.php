@@ -71,7 +71,7 @@ abstract class AbstractForm
      * ]
      * ```
      */
-    abstract public function rules();
+    abstract protected function rules();
 
     /**
      * @return array [[field, filter, params], ...]
@@ -94,7 +94,7 @@ abstract class AbstractForm
      * ```
      *
      */
-    abstract public function filters();
+    abstract protected function filters();
 
     /**
      * @return bool

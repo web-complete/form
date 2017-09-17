@@ -9,13 +9,19 @@ final class FastForm extends AbstractForm
 
     public function __construct($rules = [], $filters = [], $validatorsObject = null, $filtersObject = null)
     {
+        if(!$validatorsObject) {
+            $validatorsObject = new Validators();
+        }
+        if(!$filtersObject) {
+            $filtersObject = new Filters();
+        }
         parent::__construct($rules, $filters, $validatorsObject, $filtersObject);
     }
 
     /**
      * @return array
      */
-    public function rules()
+    protected function rules()
     {
         return [];
     }
@@ -23,7 +29,7 @@ final class FastForm extends AbstractForm
     /**
      * @return array
      */
-    public function filters()
+    protected function filters()
     {
         return [];
     }
