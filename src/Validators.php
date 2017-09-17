@@ -8,6 +8,7 @@ class Validators
     /**
      * @param $value
      * @param array $params
+     * - value : mixed - comparing value
      * - not : bool - not equals, default = false
      *
      * @return bool
