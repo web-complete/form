@@ -36,7 +36,7 @@
 **params** - массив параметров, будет передан в фильтр. Обязательность зависит от вызываемого фильтра.<br> 
 **message** - сообщение в случае ошибки. По умолчанию "error". Также может быть переопределен в свойстве $defaultError.
 
-Если поле данных не имеет ни одного правила фильтрации или валидации, то оно будет отфильтровано. Если поле необходимо, но не требует фильтрации и валидации, то можно указать его безопасность, добавив в правила rules без дополнительных параметров:
+Если поле данных не имеет ни одного правила фильтрации или валидации, то оно будет удалено. Однако, если поле необходимо, но не требует фильтрации и валидации, то можно указать его безопасность, добавив его в правила rules без дополнительных параметров:
 ```
 [
     ['name', 'string', ['min' => 3]],
@@ -44,7 +44,7 @@
 ]
 ```
  
-Форма имеет один встроенный валидатор **required**, который проверяет, что данное поле не пустое. Остальные валидаторы будут применены только к непустым полям.
+Форма имеет встроенный валидатор **required**, который проверяет, что данное поле не является пустым. Остальные валидаторы будут применены только к непустым полям.
 
 Конструктор класса может принимать следующие параметры:
 ```
@@ -74,7 +74,7 @@ API формы предоставляет следующие методы:
 **getFirstErrors()** - получить первые ошибки всех полей формы <br>
 **resetErrors()** - сбросить ошибки формы <br>
 
-В комплекте библиотеки в качестве **validatorsObject** и **filtersObject** поставляются два класса: Validators, Filters, содержащие наиболее часто используемые наборы фильтров и валидаторов.<br>
+В комплекте библиотеки в качестве **validatorsObject** и **filtersObject** поставляются два класса: Validators и Filters, содержащие наиболее часто используемые наборы фильтров и валидаторов.<br>
 Также в библиотеке поставляется класс **FastForm**, унаследованный от AbstractForm с пустыми rules и filters. Может быть использован для простых форм с передачей rules и filters через параметры конструктора.
  
 
@@ -111,19 +111,6 @@ API формы предоставляет следующие методы:
 ```
 class MyForm1 extends \WebComplete\form\AbstractForm
 {
-
-    protected function rules()
-    {
-        return [
-            [['description', 'label'], ], // safe fields (no validation)
-            [['name', 'email'], 'required', [], 'Field is required'],
-            ['name', 'string', ['min' => 2, 'max' => 50], 'Incorrect name'],
-            ['email', 'email', [], 'Incorrect email'],
-            ['price', 'methodValidator', [], 'Incorrect'],
-            ['some', [SomeValidator::class, 'method'], ['customParam' => 100], 'Incorrect'],
-            [['*'], 'regex', ['pattern' => '/^[a-z]$/'], 'Field is required'],
-        ];
-    }
     
     protected function filters()
     {
@@ -135,12 +122,34 @@ class MyForm1 extends \WebComplete\form\AbstractForm
             ['*', 'trim'],
         ];
     }
+
+    protected function rules()
+    {
+        return [
+            [['description', 'label'], ], // safe fields (no validation)
+            [['name', 'email'], 'required', [], 'Field is required'],
+            ['name', 'string', ['min' => 2, 'max' => 50], 'Incorrect name'],
+            ['email', 'email', [], 'Incorrect email'],
+            ['price', 'validatePrice'],
+            ['password', 'required'],
+            ['password_repeat', 'compare', ['field' => 'password'], 'Repeat password error'],
+            ['some', [SomeValidator::class, 'method'], ['customParam' => 100], 'Incorrect'],
+            [['*'], 'regex', ['pattern' => '/^[a-z]$/'], 'Field is required'],
+        ];
+    }
+    
+    protected function validatePrice($value, $params, AbstractForm $form)
+    {
+        ...
+        return true;
+    }
     
 }
 ```
 
 Использование формы:
 ```
+$form = new MyForm([], [], new Validators(), new Filters());
 $form->setData($_POST);
 if($form->validate()) {
     $filteredData = $form->getData();
