@@ -2,7 +2,7 @@
   "name": "web-complete/form",
   "description": "Form model",
   "license": "MIT",
-  "keywords": ["form", "model"],
+  "keywords": ["form", "model", "yii"],
   "authors": [
     {
       "name": "Maxim Kasatkin",
