@@ -53,6 +53,7 @@ abstract class AbstractForm
      *
      * validator - is a string equals to method of ValidatorsObject, method of the form or callable.
      * Validator should be declared as ($value, $params) : bool
+     * @see \WebComplete\form\Validators
      *
      * example
      * ```
@@ -74,6 +75,7 @@ abstract class AbstractForm
      *
      * filter - is a string equals to method of FiltersObject, method of the form or callable
      * Filter should be declared as ($value, $params) : mixed, and return filtered value
+     * @see \WebComplete\form\Filters
      *
      * example
      * ```
@@ -97,6 +99,13 @@ abstract class AbstractForm
         $definitions = $this->normalize($this->rules);
 
         $this->resetErrors();
+        foreach ($definitions as $field => $fieldDefinitions) {
+            foreach ($fieldDefinitions as $definition) {
+                if($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
+                    $this->addError($field, isset($definition[3]) ? $definition[3] : $this->defaultError);
+                }
+            }
+        }
         foreach ($this->getData() as $field => $value) {
             if(isset($definitions[$field])) {
                 foreach ($definitions[$field] as $definition) {
@@ -104,16 +113,9 @@ abstract class AbstractForm
                     $defParams = array_merge([$value], [array_shift($definition)], [$this]);
                     $defMessage = array_shift($definition) ?: $this->defaultError;
 
-                    if($defName == self::REQUIRED) {
-                        if($this->isEmpty($value)) {
+                    if($defName !== self::REQUIRED && !$this->isEmpty($value)) {
+                        if(!$this->call($defName, $defParams, $this->validatorsObject, true)) {
                             $this->addError($field, $defMessage);
-                        }
-                    }
-                    else {
-                        if(!$this->isEmpty($value)) {
-                            if(!$this->call($defName, $defParams, $this->validatorsObject, true)) {
-                                $this->addError($field, $defMessage);
-                            }
                         }
                     }
                 }

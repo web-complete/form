@@ -127,6 +127,25 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($form->validate());
     }
 
+    public function testValidateRequired()
+    {
+        $form = new MyForm(
+            [
+                ['a', 'validateString', ['minLength' => 3]],
+                ['b', 'required'],
+                ['b', 'validateString', ['minLength' => 3]],
+            ]
+        );
+
+        $this->assertFalse($form->validate());
+        $form->setData(['b' => 'bbb']);
+        $this->assertTrue($form->validate());
+        $form->setData(['a' => 'aa', 'b' => 'bbb']);
+        $this->assertFalse($form->validate());
+        $form->setData(['a' => 'aaa', 'b' => 'bbb']);
+        $this->assertTrue($form->validate());
+    }
+
     public function testValidateFilterAsterisk()
     {
         $form = new MyForm(
