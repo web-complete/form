@@ -55,16 +55,19 @@ abstract class AbstractForm
      * Validator should be declared as ($value, $params) : bool
      * @see \WebComplete\form\Validators
      *
+     * required - is an internal validator, checks the field is not empty
+     * * (asterisk) - rule for all fields (declared in rules or filter)
+     *
      * example
      * ```
      * [
+     *      [['name', 'email'], 'required', [], 'Field is required'],
      *      ['name', 'string', ['min' => 2, 'max' => 50], 'Incorrect name'],
      *      ['email', 'email', [], 'Incorrect email'],
-     *      [['name', 'email'], 'required', [], 'Field is required'],
-     *      [['description', 'label'], 'safe'],
+     *      [['description', 'label']], // safe fields
      *      ['price', 'methodValidator', [], 'Incorrect'],
      *      ['some', [SomeValidator::class, 'method'], ['customParam' => 100], 'Incorrect'],
-     *      [['*'], 'regexp', ['match' => '/^[a-z]$/'], 'Field is required'],
+     *      [['*'], 'regex', ['pattern' => '/^[a-z]$/'], 'Field is required'],
      * ]
      * ```
      */
@@ -77,14 +80,16 @@ abstract class AbstractForm
      * Filter should be declared as ($value, $params) : mixed, and return filtered value
      * @see \WebComplete\form\Filters
      *
+     * * (asterisk) - rule for all fields (declared in rules or filter)
+     *
      * example
      * ```
      * [
-     *      ['*', 'trim'],
-     *      ['*', 'purify', ['js' => true]],
      *      [['first_name', 'last_name'], 'capitalize'],
-     *      ['email', 'replace', ['from' => 'email.com', 'to' => 'gmail.com']],
-     *      ['content', 'stripTags'],
+     *      ['description', 'stripTags'],
+     *      ['content', 'stripJs'],
+     *      ['email', 'replace', ['pattern' => 'email.com', 'to' => 'gmail.com']],
+     *      ['*', 'trim'],
      * ]
      * ```
      *
