@@ -18,7 +18,7 @@ composer require web-complete/form
 Для использования формы необходимо создать класс, унаследованный от AbstractForm и реализовать два абстрактных метода: rules() и filters(). В примитивном случае, они могут возвращать пустые массивы.
 
 **Filters** (правила фильтрации) представляет из себя массив следующего формата:
-```
+```php
 [
     [field, filter, params]
 ]
@@ -30,7 +30,7 @@ composer require web-complete/form
 **params** - массив параметров, будет передан в фильтр. Обязательность зависит от вызываемого фильтра. 
 
 **Rules** (правила валидации) представляет из себя массив следующего формата:
-```
+```php
 [
     [field, validator, params, message]
 ]
@@ -43,7 +43,7 @@ composer require web-complete/form
 **message** - сообщение в случае ошибки. По умолчанию "error". Также может быть переопределен в свойстве $defaultError.
 
 Если поле данных не имеет ни одного правила фильтрации или валидации, то оно будет удалено. Однако, если поле необходимо, но не требует фильтрации и валидации, то можно указать его безопасность, добавив его в правила rules без дополнительных параметров:
-```
+```php
 [
     ['name', 'string', ['min' => 3]],
     ['age'], // данное поле считается безопасным
@@ -53,7 +53,7 @@ composer require web-complete/form
 Форма имеет встроенный валидатор **required**, который проверяет, что данное поле не является пустым. Остальные валидаторы будут применены только к непустым полям.
 
 Конструктор класса может принимать следующие параметры:
-```
+```php
     public function __construct(
         $rules = null,
         $filters = null,
@@ -114,7 +114,7 @@ API формы предоставляет следующие методы:
 
 Задание правил фильтрации и валидации:
 
-```
+```php
 class MyForm1 extends \WebComplete\form\AbstractForm
 {
     
@@ -154,7 +154,7 @@ class MyForm1 extends \WebComplete\form\AbstractForm
 ```
 
 Использование формы:
-```
+```php
 $form = new MyForm([], [], new Validators(), new Filters());
 $form->setData($_POST);
 if($form->validate()) {
@@ -164,7 +164,7 @@ if($form->validate()) {
 ```
 
 Использование быстрой формы:
-```
+```php
 $form = new FastForm([['name', 'required'], ['email', 'email']]);
 $form->setData($_POST);
 if($form->validate()) {
@@ -181,7 +181,7 @@ else {
 ```
 
 Создание своей абстрактной формы с правилами по умолчанию: 
-```
+```php
 abstract class MyAbstractForm extends \WebComplete\form\AbstractForm
 {
 
