@@ -2,7 +2,6 @@
 
 namespace WebComplete\form;
 
-
 abstract class AbstractForm
 {
 
@@ -34,8 +33,8 @@ abstract class AbstractForm
         $filters = null,
         $validatorsObject = null,
         $filtersObject = null
-    )
-    {
+    ) {
+    
         $this->filtersObject = $filtersObject;
         $this->validatorsObject = $validatorsObject;
 
@@ -106,20 +105,20 @@ abstract class AbstractForm
         $this->resetErrors();
         foreach ($definitions as $field => $fieldDefinitions) {
             foreach ($fieldDefinitions as $definition) {
-                if($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
+                if ($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
                     $this->addError($field, isset($definition[3]) ? $definition[3] : $this->defaultError);
                 }
             }
         }
         foreach ($this->getData() as $field => $value) {
-            if(isset($definitions[$field])) {
+            if (isset($definitions[$field])) {
                 foreach ($definitions[$field] as $definition) {
                     $defName = array_shift($definition);
                     $defParams = array_merge([$value], [array_shift($definition)], [$this]);
                     $defMessage = array_shift($definition) ?: $this->defaultError;
 
-                    if($defName !== self::REQUIRED && !$this->isEmpty($value)) {
-                        if(!$this->call($defName, $defParams, $this->validatorsObject, true)) {
+                    if ($defName !== self::REQUIRED && !$this->isEmpty($value)) {
+                        if (!$this->call($defName, $defParams, $this->validatorsObject, true)) {
                             $this->addError($field, $defMessage);
                         }
                     }
@@ -166,7 +165,7 @@ abstract class AbstractForm
      */
     public function setValue($field, $value, $filter = true)
     {
-        if($filter) {
+        if ($filter) {
             $data = $this->filter([$field => $value]);
             $value = isset($data[$field])
                 ? $data[$field]
@@ -180,10 +179,9 @@ abstract class AbstractForm
      */
     public function resetErrors($field = null)
     {
-        if($field) {
+        if ($field) {
             unset($this->errors[$field]);
-        }
-        else {
+        } else {
             $this->errors = [];
         }
     }
@@ -194,7 +192,7 @@ abstract class AbstractForm
      */
     public function addError($field, $error)
     {
-        if(!isset($this->errors[$field])) {
+        if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
         }
         $this->errors[$field][] = $error;
@@ -215,7 +213,7 @@ abstract class AbstractForm
      */
     public function getErrors($field = null)
     {
-        if($field) {
+        if ($field) {
             return isset($this->errors[$field])
                 ? $this->errors[$field]
                 : [];
@@ -230,7 +228,7 @@ abstract class AbstractForm
     {
         $result = [];
         foreach ($this->getErrors() as $field => $errors) {
-            if($errors) {
+            if ($errors) {
                 $result[$field] = reset($errors);
             }
         }
@@ -258,13 +256,13 @@ abstract class AbstractForm
         $rulesDefinitions = $this->normalize($this->rules);
 
         foreach ($data as $field => $value) {
-            if(!isset($rulesDefinitions[$field]) && !isset($filtersDefinitions[$field])) {
+            if (!isset($rulesDefinitions[$field]) && !isset($filtersDefinitions[$field])) {
                 unset($data[$field]);
                 continue;
             }
 
             $fieldDefinitions = isset($filtersDefinitions[$field]) ? $filtersDefinitions[$field] : [];
-            if(isset($filtersDefinitions['*'])) {
+            if (isset($filtersDefinitions['*'])) {
                 $fieldDefinitions = array_merge($fieldDefinitions, $filtersDefinitions['*']);
             }
 
@@ -300,11 +298,11 @@ abstract class AbstractForm
             $defName = $definition ? array_shift($definition) : null;
             $defParams = $definition ? array_shift($definition) : [];
             $defMessage = $definition ? array_shift($definition) : '';
-            if(!is_array($fields)) {
+            if (!is_array($fields)) {
                 $fields = [$fields];
             }
             foreach ($fields as $field) {
-                if(!isset($normalized[$field])) {
+                if (!isset($normalized[$field])) {
                     $normalized[$field] = [];
                 }
                 $normalized[$field][] = [$defName, $defParams, $defMessage];
@@ -326,17 +324,16 @@ abstract class AbstractForm
     private function call($defName, $defParams, $object, $default)
     {
         $callable = $defName;
-        if($defName) {
-            if(!is_array($defName)) {
-                if(method_exists($this, $defName)) {
+        if ($defName) {
+            if (!is_array($defName)) {
+                if (method_exists($this, $defName)) {
                     $callable = [$this, $defName];
-                }
-                else if($object && method_exists($object, $defName)) {
+                } elseif ($object && method_exists($object, $defName)) {
                     $callable = [$object, $defName];
                 }
             }
 
-            if(!is_callable($callable)) {
+            if (!is_callable($callable)) {
                 throw new FormException('Callable not found: ' . json_encode($callable));
             }
         }
@@ -345,5 +342,4 @@ abstract class AbstractForm
             ? call_user_func_array($callable, $defParams)
             : $default;
     }
-
 }

@@ -38,7 +38,7 @@ class Validators
         $result = true;
         $field = isset($params['field']) ? $params['field'] : false;
         $not = isset($params['not']) ? (bool)$params['not'] : false;
-        if($field) {
+        if ($field) {
             $result = $not
                 ? $value != $form->getValue($field)
                 : $value == $form->getValue($field);
@@ -67,16 +67,16 @@ class Validators
      */
     public function number($value, array $params = [])
     {
-        if(!is_numeric($value)) {
+        if (!is_numeric($value)) {
             return false;
         }
-        if($min = isset($params['min']) ? $params['min'] : null) {
-            if($value < $min) {
+        if ($min = isset($params['min']) ? $params['min'] : null) {
+            if ($value < $min) {
                 return false;
             }
         }
-        if($max = isset($params['max']) ? $params['max'] : null) {
-            if($value > $max) {
+        if ($max = isset($params['max']) ? $params['max'] : null) {
+            if ($value > $max) {
                 return false;
             }
         }
@@ -94,13 +94,13 @@ class Validators
      */
     public function string($value, array $params = [])
     {
-        if($min = isset($params['min']) ? $params['min'] : null) {
-            if(mb_strlen($value) < $min) {
+        if ($min = isset($params['min']) ? $params['min'] : null) {
+            if (mb_strlen($value) < $min) {
                 return false;
             }
         }
-        if($max = isset($params['max']) ? $params['max'] : null) {
-            if(mb_strlen($value) > $max) {
+        if ($max = isset($params['max']) ? $params['max'] : null) {
+            if (mb_strlen($value) > $max) {
                 return false;
             }
         }
@@ -119,5 +119,4 @@ class Validators
         $pattern = isset($params['pattern']) ? $params['pattern'] : '//';
         return preg_match($pattern, $value) > 0;
     }
-
 }

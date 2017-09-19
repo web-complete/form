@@ -2,17 +2,16 @@
 
 namespace WebComplete\form;
 
-
 final class FastForm extends AbstractForm
 {
 
 
     public function __construct($rules = [], $filters = [], $validatorsObject = null, $filtersObject = null)
     {
-        if(!$validatorsObject) {
+        if (!$validatorsObject) {
             $validatorsObject = new Validators();
         }
-        if(!$filtersObject) {
+        if (!$filtersObject) {
             $filtersObject = new Filters();
         }
         parent::__construct($rules, $filters, $validatorsObject, $filtersObject);
@@ -33,5 +32,4 @@ final class FastForm extends AbstractForm
     {
         return [];
     }
-
 }

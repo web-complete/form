@@ -19,13 +19,13 @@ class Filters
         $charlist = isset($params['charlist']) ? $params['charlist'] : ' ';
         $left = isset($params['left']) ? (bool)$params['left'] : true;
         $right = isset($params['right']) ? (bool)$params['right'] : true;
-        if($left && $right) {
+        if ($left && $right) {
             return trim($value, $charlist);
         }
-        if($left) {
+        if ($left) {
             return ltrim($value, $charlist);
         }
-        if($right) {
+        if ($right) {
             return rtrim($value, $charlist);
         }
         return $value;
@@ -87,8 +87,8 @@ class Filters
         $to = isset($params['to']) ? $params['to'] : '';
         try {
             return preg_replace($pattern, $to, $value);
+        } catch (\Exception $e) {
         }
-        catch (\Exception $e) {}
         return str_replace($pattern, $to, $value);
     }
 
@@ -114,5 +114,4 @@ class Filters
     {
         return preg_replace('/<script(.*?)>(.*?)<\/script>/', '', $value);
     }
-
 }
