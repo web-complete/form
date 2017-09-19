@@ -43,7 +43,8 @@ class FormTest extends \PHPUnit\Framework\TestCase
             [
                 [['a', 'b'], 'increase', ['amount' => 2]],
             ],
-            null, new Filters()
+            null,
+            new Filters()
         );
         $form->setData(['a' => 1, 'b' => 2, 'c' => 3]);
         $this->assertEquals(['a' => 3, 'b' => 4, 'c' => 3], $form->getData());
@@ -154,8 +155,9 @@ class FormTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['*', 'trim']
-            ]
-            , null, new Filters()
+            ],
+            null,
+            new Filters()
         );
 
         $form->setData(['a' => 'aa ', 'b' => 'bbb ', 'c' => 'cccc ']);
@@ -168,7 +170,8 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $form = new FastForm(
             [['a']],
             [['a', 'trim']],
-            null, new Filters()
+            null,
+            new Filters()
         );
         $form->setData(['a' => 'aa ']);
         $this->assertEquals('aa', $form->getValue('a'));
@@ -255,5 +258,4 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->validate());
         $this->assertFalse($form->hasErrors());
     }
-
 }
