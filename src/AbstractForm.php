@@ -4,7 +4,6 @@ namespace WebComplete\form;
 
 abstract class AbstractForm
 {
-
     const REQUIRED = 'required';
 
     protected $data = [];
@@ -34,7 +33,6 @@ abstract class AbstractForm
         $validatorsObject = null,
         $filtersObject = null
     ) {
-    
         $this->filtersObject = $filtersObject;
         $this->validatorsObject = $validatorsObject;
 
