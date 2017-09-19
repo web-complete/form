@@ -22,27 +22,20 @@ abstract class AbstractForm
 
     /**
      * AbstractForm constructor.
+     *
      * @param null|array $rules
      * @param null|array $filters
      * @param null|object $filtersObject
      * @param null|object $validatorsObject
      */
-    public function __construct(
-        $rules = null,
-        $filters = null,
-        $validatorsObject = null,
-        $filtersObject = null
-    ) {
+    public function __construct($rules = null, $filters = null, $validatorsObject = null, $filtersObject = null)
+    {
         $this->filtersObject = $filtersObject;
         $this->validatorsObject = $validatorsObject;
 
-        $this->rules = is_array($rules)
-            ? array_merge($this->rules(), $rules)
-            : $this->rules();
+        $this->rules = is_array($rules) ? array_merge($this->rules(), $rules) : $this->rules();
 
-        $this->filters = is_array($filters)
-            ? array_merge($this->filters(), $filters)
-            : $this->filters();
+        $this->filters = is_array($filters) ? array_merge($this->filters(), $filters) : $this->filters();
     }
 
     /**
@@ -137,23 +130,24 @@ abstract class AbstractForm
 
     /**
      * @param array $data
+     *
      * @return $this
      */
     public function setData(array $data)
     {
         $this->data = $this->filter($data);
+
         return $this;
     }
 
     /**
      * @param $field
+     *
      * @return mixed|null
      */
     public function getValue($field)
     {
-        return isset($this->data[$field])
-            ? $this->data[$field]
-            : null;
+        return isset($this->data[$field]) ? $this->data[$field] : null;
     }
 
     /**
@@ -165,9 +159,7 @@ abstract class AbstractForm
     {
         if ($filter) {
             $data = $this->filter([$field => $value]);
-            $value = isset($data[$field])
-                ? $data[$field]
-                : null;
+            $value = isset($data[$field]) ? $data[$field] : null;
         }
         $this->data[$field] = $value;
     }
@@ -198,6 +190,7 @@ abstract class AbstractForm
 
     /**
      * @param string|null $field
+     *
      * @return bool
      */
     public function hasErrors($field = null)
@@ -207,15 +200,15 @@ abstract class AbstractForm
 
     /**
      * @param string|null $field
+     *
      * @return array
      */
     public function getErrors($field = null)
     {
         if ($field) {
-            return isset($this->errors[$field])
-                ? $this->errors[$field]
-                : [];
+            return isset($this->errors[$field]) ? $this->errors[$field] : [];
         }
+
         return $this->errors;
     }
 
@@ -230,22 +223,23 @@ abstract class AbstractForm
                 $result[$field] = reset($errors);
             }
         }
+
         return $result;
     }
 
     /**
      * @param $field
+     *
      * @return string|null
      */
     public function getFirstError($field)
     {
-        return isset($this->errors[$field]) && $this->errors[$field]
-            ? reset($this->errors[$field])
-            : null;
+        return isset($this->errors[$field]) && $this->errors[$field] ? reset($this->errors[$field]) : null;
     }
 
     /**
      * @param array $data
+     *
      * @return array
      */
     protected function filter(array $data)
@@ -286,6 +280,7 @@ abstract class AbstractForm
 
     /**
      * @param $definitions
+     *
      * @return array
      */
     private function normalize($definitions)
@@ -336,8 +331,6 @@ abstract class AbstractForm
             }
         }
 
-        return $callable
-            ? call_user_func_array($callable, $defParams)
-            : $default;
+        return $callable ? call_user_func_array($callable, $defParams) : $default;
     }
 }
