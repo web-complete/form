@@ -26,7 +26,7 @@ final class FastForm extends AbstractForm
     /**
      * @return array
      */
-    protected function rules(): array
+    public function rules(): array
     {
         return [];
     }
@@ -34,7 +34,7 @@ final class FastForm extends AbstractForm
     /**
      * @return array
      */
-    protected function filters(): array
+    public function filters(): array
     {
         return [];
     }
