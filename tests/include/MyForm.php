@@ -9,7 +9,7 @@ class MyForm extends AbstractForm
     /**
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
 
@@ -19,7 +19,7 @@ class MyForm extends AbstractForm
     /**
      * @return array
      */
-    protected function filters()
+    protected function filters(): array
     {
         return [
 

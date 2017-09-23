@@ -13,14 +13,14 @@ class Validators
      *
      * @return bool
      */
-    public function equals($value, array $params = [])
+    public function equals($value, array $params = []): bool
     {
-        $compareValue = isset($params['value']) ? $params['value'] : $value;
+        $compareValue = $params['value'] ?? $value;
         $not = isset($params['not']) ? (bool)$params['not'] : false;
 
         return $not
-            ? $value != $compareValue
-            : $value == $compareValue;
+            ? $value !== $compareValue
+            : $value === $compareValue;
     }
 
     /**
@@ -33,15 +33,15 @@ class Validators
      *
      * @return bool
      */
-    public function compare($value, array $params, AbstractForm $form)
+    public function compare($value, array $params, AbstractForm $form): bool
     {
         $result = true;
-        $field = isset($params['field']) ? $params['field'] : false;
+        $field = $params['field'] ?? false;
         $not = isset($params['not']) ? (bool)$params['not'] : false;
         if ($field) {
             $result = $not
-                ? $value != $form->getValue($field)
-                : $value == $form->getValue($field);
+                ? $value !== $form->getValue($field)
+                : $value === $form->getValue($field);
         }
 
         return $result;
@@ -52,9 +52,11 @@ class Validators
      *
      * @return bool
      */
-    public function email($value)
+    public function email($value): bool
     {
-        return preg_match('/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/', $value) > 0;
+        $pattern = '/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.'
+            . '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/';
+        return preg_match($pattern, $value) > 0;
     }
 
     /**
@@ -65,17 +67,17 @@ class Validators
      *
      * @return bool
      */
-    public function number($value, array $params = [])
+    public function number($value, array $params = []): bool
     {
         if (!is_numeric($value)) {
             return false;
         }
-        if ($min = isset($params['min']) ? $params['min'] : null) {
+        if ($min = $params['min'] ?? null) {
             if ($value < $min) {
                 return false;
             }
         }
-        if ($max = isset($params['max']) ? $params['max'] : null) {
+        if ($max = $params['max'] ?? null) {
             if ($value > $max) {
                 return false;
             }
@@ -92,14 +94,14 @@ class Validators
      *
      * @return bool
      */
-    public function string($value, array $params = [])
+    public function string($value, array $params = []): bool
     {
-        if ($min = isset($params['min']) ? $params['min'] : null) {
+        if ($min = $params['min'] ?? null) {
             if (mb_strlen($value) < $min) {
                 return false;
             }
         }
-        if ($max = isset($params['max']) ? $params['max'] : null) {
+        if ($max = $params['max'] ?? null) {
             if (mb_strlen($value) > $max) {
                 return false;
             }
@@ -114,9 +116,9 @@ class Validators
      *
      * @return bool
      */
-    public function regex($value, array $params = [])
+    public function regex($value, array $params = []): bool
     {
-        $pattern = isset($params['pattern']) ? $params['pattern'] : '//';
+        $pattern = $params['pattern'] ?? '//';
         return preg_match($pattern, $value) > 0;
     }
 }

@@ -2,6 +2,9 @@
 
 [![Build Status](https://travis-ci.org/web-complete/form.svg?branch=master)](https://travis-ci.org/web-complete/form)
 [![Coverage Status](https://coveralls.io/repos/github/web-complete/form/badge.svg?branch=master)](https://coveralls.io/github/web-complete/form?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/web-complete/form/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/web-complete/form/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/web-complete/form/version)](https://packagist.org/packages/web-complete/form)
+[![License](https://poser.pugx.org/web-complete/form/license)](https://packagist.org/packages/web-complete/form)
 
 Простая, но очень гибкая модель для фильтрации и валидации данных на стороне сервера, созданная по мотивам Yii Forms.
 

@@ -9,13 +9,7 @@ abstract class AbstractForm
     protected $data = [];
     protected $errors = [];
     protected $defaultError = 'error';
-    /**
-     * @var object
-     */
     protected $filtersObject;
-    /**
-     * @var object
-     */
     protected $validatorsObject;
     private $rules;
     private $filters;
@@ -25,13 +19,17 @@ abstract class AbstractForm
      *
      * @param null|array $rules
      * @param null|array $filters
-     * @param null|object $filtersObject
-     * @param null|object $validatorsObject
+     * @param $filtersObject
+     * @param $validatorsObject
      */
     public function __construct($rules = null, $filters = null, $validatorsObject = null, $filtersObject = null)
     {
-        $this->filtersObject = $filtersObject;
-        $this->validatorsObject = $validatorsObject;
+        if (is_object($filtersObject)) {
+            $this->filtersObject = $filtersObject;
+        }
+        if (is_object($validatorsObject)) {
+            $this->validatorsObject = $validatorsObject;
+        }
 
         $this->rules = is_array($rules) ? array_merge($this->rules(), $rules) : $this->rules();
 
@@ -61,7 +59,7 @@ abstract class AbstractForm
      * ]
      * ```
      */
-    abstract protected function rules();
+    abstract protected function rules(): array;
 
     /**
      * @return array [[field, filter, params], ...]
@@ -84,20 +82,22 @@ abstract class AbstractForm
      * ```
      *
      */
-    abstract protected function filters();
+    abstract protected function filters(): array;
 
     /**
      * @return bool
+     * @throws \WebComplete\form\FormException
      */
-    public function validate()
+    public function validate(): bool
     {
+        /** @var array[] $definitions */
         $definitions = $this->normalize($this->rules);
 
         $this->resetErrors();
         foreach ($definitions as $field => $fieldDefinitions) {
             foreach ($fieldDefinitions as $definition) {
                 if ($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
-                    $this->addError($field, isset($definition[3]) ? $definition[3] : $this->defaultError);
+                    $this->addError($field, $definition[3] ?? $this->defaultError);
                 }
             }
         }
@@ -108,10 +108,9 @@ abstract class AbstractForm
                     $defParams = array_merge([$value], [array_shift($definition)], [$this]);
                     $defMessage = array_shift($definition) ?: $this->defaultError;
 
-                    if ($defName !== self::REQUIRED && !$this->isEmpty($value)) {
-                        if (!$this->call($defName, $defParams, $this->validatorsObject, true)) {
-                            $this->addError($field, $defMessage);
-                        }
+                    if ($defName !== self::REQUIRED && !$this->isEmpty($value)
+                        && !$this->call($defName, $defParams, $this->validatorsObject, true)) {
+                        $this->addError($field, $defMessage);
                     }
                 }
             }
@@ -123,7 +122,7 @@ abstract class AbstractForm
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
@@ -132,6 +131,7 @@ abstract class AbstractForm
      * @param array $data
      *
      * @return $this
+     * @throws \WebComplete\form\FormException
      */
     public function setData(array $data)
     {
@@ -147,19 +147,21 @@ abstract class AbstractForm
      */
     public function getValue($field)
     {
-        return isset($this->data[$field]) ? $this->data[$field] : null;
+        return $this->data[$field] ?? null;
     }
 
     /**
      * @param $field
      * @param $value
      * @param bool $filter
+     *
+     * @throws \WebComplete\form\FormException
      */
-    public function setValue($field, $value, $filter = true)
+    public function setValue($field, $value, $filter = true): void
     {
         if ($filter) {
             $data = $this->filter([$field => $value]);
-            $value = isset($data[$field]) ? $data[$field] : null;
+            $value = $data[$field] ?? null;
         }
         $this->data[$field] = $value;
     }
@@ -167,7 +169,7 @@ abstract class AbstractForm
     /**
      * @param string $field
      */
-    public function resetErrors($field = null)
+    public function resetErrors($field = null): void
     {
         if ($field) {
             unset($this->errors[$field]);
@@ -180,7 +182,7 @@ abstract class AbstractForm
      * @param $field
      * @param $error
      */
-    public function addError($field, $error)
+    public function addError($field, $error): void
     {
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
@@ -193,7 +195,7 @@ abstract class AbstractForm
      *
      * @return bool
      */
-    public function hasErrors($field = null)
+    public function hasErrors($field = null): bool
     {
         return count($this->getErrors($field)) > 0;
     }
@@ -203,10 +205,10 @@ abstract class AbstractForm
      *
      * @return array
      */
-    public function getErrors($field = null)
+    public function getErrors($field = null): array
     {
         if ($field) {
-            return isset($this->errors[$field]) ? $this->errors[$field] : [];
+            return $this->errors[$field] ?? [];
         }
 
         return $this->errors;
@@ -215,7 +217,7 @@ abstract class AbstractForm
     /**
      * @return array
      */
-    public function getFirstErrors()
+    public function getFirstErrors(): array
     {
         $result = [];
         foreach ($this->getErrors() as $field => $errors) {
@@ -232,7 +234,7 @@ abstract class AbstractForm
      *
      * @return string|null
      */
-    public function getFirstError($field)
+    public function getFirstError($field): ?string
     {
         return isset($this->errors[$field]) && $this->errors[$field] ? reset($this->errors[$field]) : null;
     }
@@ -241,8 +243,9 @@ abstract class AbstractForm
      * @param array $data
      *
      * @return array
+     * @throws \WebComplete\form\FormException
      */
-    protected function filter(array $data)
+    protected function filter(array $data): array
     {
         $filtersDefinitions = $this->normalize($this->filters);
         $rulesDefinitions = $this->normalize($this->rules);
@@ -253,7 +256,7 @@ abstract class AbstractForm
                 continue;
             }
 
-            $fieldDefinitions = isset($filtersDefinitions[$field]) ? $filtersDefinitions[$field] : [];
+            $fieldDefinitions = $filtersDefinitions[$field] ?? [];
             if (isset($filtersDefinitions['*'])) {
                 $fieldDefinitions = array_merge($fieldDefinitions, $filtersDefinitions['*']);
             }
@@ -273,9 +276,9 @@ abstract class AbstractForm
      *
      * @return bool
      */
-    protected function isEmpty($value)
+    protected function isEmpty($value): bool
     {
-        return $value === null || $value == '' || (is_array($value) && !count($value));
+        return $value === null || $value === '' || (is_array($value) && !count($value));
     }
 
     /**
@@ -283,9 +286,10 @@ abstract class AbstractForm
      *
      * @return array
      */
-    private function normalize($definitions)
+    private function normalize($definitions): array
     {
         $normalized = [];
+        /** @var array[] $definitions */
         foreach ($definitions as $definition) {
             $fields = array_shift($definition);
             $defName = $definition ? array_shift($definition) : null;
@@ -308,7 +312,7 @@ abstract class AbstractForm
     /**
      * @param $defName
      * @param $defParams
-     * @param null|object $object
+     * @param $object
      * @param $default
      *
      * @return mixed|null

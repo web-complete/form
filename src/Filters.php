@@ -14,11 +14,11 @@ class Filters
      *
      * @return string
      */
-    public function trim($value, array $params = [])
+    public function trim($value, array $params = []): string
     {
-        $charlist = isset($params['charlist']) ? $params['charlist'] : ' ';
-        $left = isset($params['left']) ? (bool)$params['left'] : true;
-        $right = isset($params['right']) ? (bool)$params['right'] : true;
+        $charlist = $params['charlist'] ?? ' ';
+        $left = $params['left'] ?? true;
+        $right = $params['right'] ?? true;
         if ($left && $right) {
             return trim($value, $charlist);
         }
@@ -36,7 +36,7 @@ class Filters
      *
      * @return string
      */
-    public function escape($value)
+    public function escape($value): string
     {
         return htmlspecialchars($value);
     }
@@ -46,7 +46,7 @@ class Filters
      *
      * @return string
      */
-    public function capitalize($value)
+    public function capitalize($value): string
     {
         $value = $this->lowercase($value);
         return mb_strtoupper(mb_substr($value, 0, 1, 'UTF-8'), 'UTF-8') .
@@ -58,7 +58,7 @@ class Filters
      *
      * @return string
      */
-    public function lowercase($value)
+    public function lowercase($value): string
     {
         return mb_strtolower($value);
     }
@@ -68,7 +68,7 @@ class Filters
      *
      * @return string
      */
-    public function uppercase($value)
+    public function uppercase($value): string
     {
         return mb_strtoupper($value);
     }
@@ -81,10 +81,10 @@ class Filters
      *
      * @return string
      */
-    public function replace($value, $params)
+    public function replace($value, $params): string
     {
-        $pattern = isset($params['pattern']) ? $params['pattern'] : '';
-        $to = isset($params['to']) ? $params['to'] : '';
+        $pattern = $params['pattern'] ?? '';
+        $to = $params['to'] ?? '';
         try {
             return preg_replace($pattern, $to, $value);
         } catch (\Exception $e) {
@@ -99,9 +99,9 @@ class Filters
      *
      * @return string
      */
-    public function stripTags($value, array $params = [])
+    public function stripTags($value, array $params = []): string
     {
-        $allowableTags = isset($params['allowableTags']) ? $params['allowableTags'] : null;
+        $allowableTags = $params['allowableTags'] ?? null;
         return strip_tags($value, $allowableTags);
     }
 
@@ -110,7 +110,7 @@ class Filters
      *
      * @return string
      */
-    public function stripJs($value)
+    public function stripJs($value): string
     {
         return preg_replace('/<script(.*?)>(.*?)<\/script>/', '', $value);
     }
