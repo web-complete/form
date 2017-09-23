@@ -234,7 +234,7 @@ abstract class AbstractForm
      *
      * @return string|null
      */
-    public function getFirstError($field): ?string
+    public function getFirstError($field)
     {
         return isset($this->errors[$field]) && $this->errors[$field] ? reset($this->errors[$field]) : null;
     }
