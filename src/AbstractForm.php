@@ -157,7 +157,7 @@ abstract class AbstractForm
      *
      * @throws \WebComplete\form\FormException
      */
-    public function setValue($field, $value, $filter = true): void
+    public function setValue($field, $value, $filter = true)
     {
         if ($filter) {
             $data = $this->filter([$field => $value]);
@@ -169,7 +169,7 @@ abstract class AbstractForm
     /**
      * @param string $field
      */
-    public function resetErrors($field = null): void
+    public function resetErrors($field = null)
     {
         if ($field) {
             unset($this->errors[$field]);
@@ -182,7 +182,7 @@ abstract class AbstractForm
      * @param $field
      * @param $error
      */
-    public function addError($field, $error): void
+    public function addError($field, $error)
     {
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
