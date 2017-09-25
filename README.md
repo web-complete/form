@@ -41,7 +41,7 @@ where:
 where:
 
 **field** - field name or array of fields<br>
-**validator** - validator name. Может быть строкой, либо callable. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in validator objects array (validatorsObject) in case of string. The validator will be called with arguments: $value and $params (parameters from the filtration rules) and will return boolean.<br>
+**validator** - validator name. It can be a string or callable function. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in validator objects array (validatorsObject) in case of string. The validator will be called with arguments: $value and $params (parameters from the filtration rules) and will return boolean.<br>
 **params** - array of parameters will be passed to the filter. The requirement depends on the called filter.<br>
 **message** - Message in case of error. Returns "error" by default or value from overridden the $defaultError property.
 
