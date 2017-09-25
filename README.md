@@ -1,4 +1,4 @@
-# Form model
+# Form model (PHP 7+)
 
 [![Build Status](https://travis-ci.org/web-complete/form.svg?branch=master)](https://travis-ci.org/web-complete/form)
 [![Coverage Status](https://coveralls.io/repos/github/web-complete/form/badge.svg?branch=master)](https://coveralls.io/github/web-complete/form?branch=master)
@@ -6,9 +6,9 @@
 [![Latest Stable Version](https://poser.pugx.org/web-complete/form/version)](https://packagist.org/packages/web-complete/form)
 [![License](https://poser.pugx.org/web-complete/form/license)](https://packagist.org/packages/web-complete/form)
 
-Простая, но очень гибкая модель для фильтрации и валидации данных на стороне сервера, созданная по мотивам Yii Forms.
+Flexible filtration and validation server side Form Model like in Yii2.
 
-Библиотека не имеет зависимостей и может быть легко использована в любом фреймворке.
+The library has no dependencies and can be easily used with any frameworks or code.
 
 ## Installation
 
@@ -18,44 +18,45 @@ composer require web-complete/form
 
 ## Usage
 
-Для использования формы необходимо создать класс, унаследованный от AbstractForm и реализовать два абстрактных метода: rules() и filters(). В примитивном случае, они могут возвращать пустые массивы.
+To use the Form, you need to create a class which extend AbstractForm and implement abstract methods: rules () and filters (). In the primitive case, they can return empty arrays.
 
-**Filters** (правила фильтрации) представляет из себя массив следующего формата:
+**Filters** (filtration rules) is an array of the following format:
 ```php
 [
     [field, filter, params]
 ]
 ```
-где:
+where:
 
-**field** - название поля (ключ массива данных) либо массив полей<br>
-**filter** - название фильтра. Может быть строкой, либо callable. В случае, если передана строка, то форма проверит наличие одноименного метода в порядке приоритета: в собственном объекте, в объекте фильтров (filtersObject). Фильтр будет вызван с параметрами: $value (значение), $params (параметры из правила), $form (текущий объект формы) и должен вернуть отфильтрованное значение.<br>
-**params** - массив параметров, будет передан в фильтр. Обязательность зависит от вызываемого фильтра. 
+**field** - field name or array of fields<br>
+**filter** - filter name. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in filter objects array (filtersObject) in case of string. The filter will be called with arguments: $value, $params (parameters from the filtration rules), $form (current from object) and will return the filtered value.<br>
+**params** - array of parameters will be passed to the filter. The requirement depends on the called filter.
 
-**Rules** (правила валидации) представляет из себя массив следующего формата:
+**Rules** (validation rules) is an array of the following format:
 ```php
 [
     [field, validator, params, message]
 ]
 ```
-где:
+where:
 
-**field** - название поля (ключ массива данных) либо массив полей<br>
-**validator** - название валидатора. Может быть строкой, либо callable. В случае, если передана строка, то форма проверит наличие одноименного метода в порядке приоритета: в собственном объекте, в объекте валидаций (validatorsObject). Валидатор будет вызван с параметрами: $value (значение) и $params (параметры из правила) и должен вернуть булево значение.<br>
-**params** - массив параметров, будет передан в фильтр. Обязательность зависит от вызываемого фильтра.<br> 
-**message** - сообщение в случае ошибки. По умолчанию "error". Также может быть переопределен в свойстве $defaultError.
+**field** - field name or array of fields<br>
+**validator** - validator name. Может быть строкой, либо callable. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in validator objects array (validatorsObject) in case of string. The validator will be called with arguments: $value and $params (parameters from the filtration rules) and will return boolean.<br>
+**params** - array of parameters will be passed to the filter. The requirement depends on the called filter.<br>
+**message** - Message in case of error. Returns "error" by default or value from overridden the $defaultError property.
 
-Если поле данных не имеет ни одного правила фильтрации или валидации, то оно будет удалено. Однако, если поле необходимо, но не требует фильтрации и валидации, то можно указать его безопасность, добавив его в правила rules без дополнительных параметров:
+If the data field does not have any filtering or validation rules, it will be deleted. However, if the field is necessary, but does not require filtering and validation, you can specify its security by adding it to the rules rules without additional arguments:
 ```php
 [
     ['name', 'string', ['min' => 3]],
-    ['age'], // данное поле считается безопасным
+    ['age'], // this field is considered as safe
 ]
 ```
- 
-Форма имеет встроенный валидатор **required**, который проверяет, что данное поле не является пустым. Остальные валидаторы будут применены только к непустым полям.
 
-Конструктор класса может принимать следующие параметры:
+The form has a built-in validator **required**, which checks that this field is not empty. The other validators will only be applied to non-empty fields.
+
+The class constructor takes the following arguments:
+
 ```php
     public function __construct(
         $rules = null,
@@ -65,57 +66,56 @@ composer require web-complete/form
     )
 ```
 
-**rules** - массив правил, будет добавлен к правилам **rules()** (необязательный)<br>
-**filters** - массив правил, будет добавлен к правилам **filters()** (необязательный)<br>
-**validatorsObject** - объект, содержащий методы валидации (необязательный)<br>
-**filtersObject** - объект, содержащий методы фильтрации (необязательный)<br>
+**rules** - will be merged with **rules()** (optional)<br>
+**filters** - will be merged with **filters()** (optional)<br>
+**validatorsObject** - object with validation methods (optional)<br>
+**filtersObject** - object with filtration methods (optional)<br>
 
-API формы предоставляет следующие методы:
+The form API provides the following methods:
 
-**validate()** : - проверить данные на валидность<br>
-**setData($data)** - отфильтровать и заполнить данные формы <br>
-**getData()** - получить данные формы <br>
-**setValue($field, $value, $filter = true)** - отфильтровать (по умолчанию) и заполнить поле формы <br>
-**getValue($field)** - получить значение поля<br>
-**addError($field, $error)** - добавить ошибку поля<br>
-**hasErrors($field = null)** - проверить наличие ошибок у формы или поля <br>
-**getErrors($field = null)** - получить ошибки формы или поля <br>
-**getFirstErrors()** - получить первые ошибки всех полей формы <br>
-**resetErrors()** - сбросить ошибки формы <br>
+**validate()** : - validate data<br>
+**setData($data)** - filter and set form data<br>
+**getData()** - get form data<br>
+**setValue($field, $value, $filter = true)** - filter (by default) and set form field value<br>
+**getValue($field)** - get form field value<br>
+**addError($field, $error)** - add an error for field<br>
+**hasErrors($field = null)** - check for errors in the form or field <br>
+**getErrors($field = null)** - get form or field errors <br>
+**getFirstErrors()** - get the first errors of all form fields <br>
+**resetErrors()** - reset form errors <br>
 
-В комплекте библиотеки в качестве **validatorsObject** и **filtersObject** поставляются два класса: Validators и Filters, содержащие наиболее часто используемые наборы фильтров и валидаторов.<br>
-Также в библиотеке поставляется класс **FastForm**, унаследованный от AbstractForm с пустыми rules и filters. Может быть использован для простых форм с передачей rules и filters через параметры конструктора.
+This library has classes **Validators** and **Filters** which contains the most commonly used filters and validators and
+**FastForm** class form simple forms.
  
-
 ## Filters
-Фильтры, поставляемые в комплекте с библиотекой (могут быть использованы самостоятельно):
+    Filters supplied with the library (can be used independently):
 
-**trim** - обрезание пробелов по краям (Возможные параметры: charlist, left, right)<br>
+**trim** - trim spaces (arguments: charlist, left, right)<br>
 **escape**  - htmlspecialchars<br>
-**capitalize** - перевод значение в нижний регистр + заглавная буква<br>
-**lowercase** - перевод значение в нижний регистр <br>
-**uppercase** - перевод значение в верхний регистр <br>
-**replace** - замена подстроки (Возможные параметры: pattern (строка или регулярное выражение), to)<br>
-**stripTags** - вырезание html-тегов <br>
-**stripJs** - вырезание js <br>
+**capitalize** - transform string to lowercase and capitalize first char<br>
+**lowercase** - transform string to lowercase <br>
+**uppercase** - transform string to uppercase <br>
+**replace** - replace substring (optional arguments: pattern (string or regular expression), to)<br>
+**stripTags** - strip html-tags <br>
+**stripJs** - strip js <br>
 
-Для более подробной информации см. аннотации в классе Filters
+For more information, see the **Filters** class annotations  
 
 ## Validators
-Валидаторы, поставляемые в комплекте с библиотекой (могут быть использованы самостоятельно):
+    Validators supplied with the library (can be used independently):
 
-**equals** - сравнение с другим значением (Параметры: value, not (проверяет неравенство, если true))<br>
-**compare** - сравнение с другим полем формы (Параметры: field (третьим аргументом ожидает объект формы), not (проверяет неравенство, если true))<br>
+**equals** - comparison with other value (arguments: value, not (check inequality in case of **true**))<br>
+**compare** - comparison with other value (arguments: field (The third argument is the **Form** object), not (check inequality in case of **true**))<br>
 **email** - e-mail <br>
-**number** - числовое значение (Возможные параметры: min, max) <br>
-**string** - строка (Возможные параметры: min, max - длина строки) <br>
-**regex** - регулярное выражение (Параметры: pattern) <br>
+**number** - validate if numeric (optional arguments: min, max) <br>
+**string** - validate if string (optional arguments: min, max - string length) <br>
+**regex** - regular expression (arguments: pattern) <br>
 
-Для более подробной информации см. аннотации в классе Validators
+For more information, see the **Validators** class annotations  
 
 ## Examples
 
-Задание правил фильтрации и валидации:
+Filtering and validation rules:
 
 ```php
 class MyForm1 extends \WebComplete\form\AbstractForm
@@ -156,7 +156,8 @@ class MyForm1 extends \WebComplete\form\AbstractForm
 }
 ```
 
-Использование формы:
+Form usage:
+
 ```php
 $form = new MyForm([], [], new Validators(), new Filters());
 $form->setData($_POST);
@@ -166,7 +167,8 @@ if($form->validate()) {
 }
 ```
 
-Использование быстрой формы:
+Fast Form usage:
+
 ```php
 $form = new FastForm([['name', 'required'], ['email', 'email']]);
 $form->setData($_POST);
@@ -183,7 +185,8 @@ else {
 }
 ```
 
-Создание своей абстрактной формы с правилами по умолчанию: 
+Custom abstract form creation with default rules:
+ 
 ```php
 abstract class MyAbstractForm extends \WebComplete\form\AbstractForm
 {
