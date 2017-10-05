@@ -235,6 +235,7 @@ class FormTest extends \PHPUnit\Framework\TestCase
             [
                 ['a', 'number', ['min' => 3, 'max' => 4], 'error2'],
                 [['a', 'b', 'c'], 'number', ['min' => 2, 'max' => 5]],
+                ['d', 'required', [], 'error3'],
             ],
             [],
             new Validators()
@@ -244,17 +245,18 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($form->hasErrors());
         $this->assertFalse($form->validate());
         $this->assertTrue($form->hasErrors());
-        $this->assertEquals(['a' => ['error2', 'error'], 'c' => ['error']], $form->getErrors());
-        $this->assertEquals(['a' => 'error2', 'c' => 'error'], $form->getFirstErrors());
+        $this->assertEquals(['a' => ['error2', 'error'], 'c' => ['error'], 'd' => ['error3']], $form->getErrors());
+        $this->assertEquals(['a' => 'error2', 'c' => 'error', 'd' => 'error3'], $form->getFirstErrors());
         $this->assertEquals('error2', $form->getFirstError('a'));
         $this->assertEquals(['error2', 'error'], $form->getErrors('a'));
         $this->assertTrue($form->hasErrors('c'));
+        $this->assertTrue($form->hasErrors('d'));
         $this->assertFalse($form->hasErrors('b'));
         $form->resetErrors('c');
         $this->assertTrue($form->hasErrors('a'));
         $this->assertFalse($form->hasErrors('c'));
 
-        $form->setData(['a' => 3, 'b' => 3, 'c' => 5]);
+        $form->setData(['a' => 3, 'b' => 3, 'c' => 5, 'd' => 1]);
         $this->assertTrue($form->validate());
         $this->assertFalse($form->hasErrors());
     }

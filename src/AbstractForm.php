@@ -165,7 +165,7 @@ abstract class AbstractForm implements FormInterface
         foreach ($definitions as $field => $fieldDefinitions) {
             foreach ($fieldDefinitions as $definition) {
                 if ($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
-                    $this->addError($field, $definition[3] ?? $this->defaultError);
+                    $this->addError($field, $definition[2] ?? $this->defaultError);
                 }
             }
         }
