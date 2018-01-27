@@ -210,7 +210,7 @@ abstract class AbstractForm implements FormInterface
     {
         $callable = $defName;
         if ($defName) {
-            if (!\is_array($defName)) {
+            if (\is_string($defName)) {
                 if (\method_exists($this, $defName)) {
                     $callable = [$this, $defName];
                 } elseif ($object && \method_exists($object, $defName)) {
