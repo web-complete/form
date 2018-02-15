@@ -260,4 +260,63 @@ class FormTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->validate());
         $this->assertFalse($form->hasErrors());
     }
+
+    public function testNestedFiltering()
+    {
+        $form = new FastForm(
+            [],
+            [
+                [['a', 'b.nested.field'], 'increase', ['amount' => 2]],
+            ],
+            null,
+            new Filters()
+        );
+        $form->setData(['a' => 1, 'b' => ['nested' => ['field' => 2], 'second' => 3]]);
+        $this->assertEquals(['a' => 3, 'b' => ['nested' => ['field' => 4], 'second' => 3]], $form->getData());
+    }
+
+    public function testNestedValidating()
+    {
+        $form = new MyForm(
+            [
+                [['a', 'b.nested.field'], 'validateString', ['minLength' => 3]],
+            ]
+        );
+
+        $form->setData(['a' => 'aaa', 'b' => ['nested' => ['field' => 'bbb']]]);
+        $this->assertTrue($form->validate());
+
+        $form->setData(['a' => 'aa ', 'b' => ['nested' => ['field' => 'bb']]]);
+        $this->assertFalse($form->validate());
+    }
+
+    public function testNestedRequired()
+    {
+        $form = new MyForm(
+            [
+                [['a', 'b.nested.field'], 'required'],
+            ]
+        );
+
+        $form->setData(['a' => 'aaa', 'b' => ['second' => 'bbb']]);
+        $this->assertFalse($form->validate());
+        $this->assertEquals(['b.nested.field' => ['error']], $form->getErrors());
+        $this->assertEquals(['error'], $form->getErrors('b.nested.field'));
+        $form->setData(['a' => 'aaa', 'b' => ['nested' => ['field' => 'bbb']]]);
+        $this->assertTrue($form->validate());
+        $form->setData(['a' => 'aaa', 'b' => ['nested' => ['field' => 'bbb'], 'second' => 'bbb']]);
+        $this->assertTrue($form->validate());
+    }
+
+    public function testNestedRequiredFail()
+    {
+        $form = new MyForm(
+            [
+                [['a', 'b.nested.field'], 'required'],
+            ]
+        );
+
+        $form->setData(['a' => 'aaa', 'b' => 'bbb']);
+        $this->assertFalse($form->validate());
+    }
 }

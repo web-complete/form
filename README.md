@@ -28,7 +28,7 @@ To use the Form, you need to create a class which extend AbstractForm and implem
 ```
 where:
 
-**field** - field name or array of fields<br>
+**field** - field name or field path (dot separated) or array of fields<br>
 **filter** - filter name. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in filter objects array (filtersObject) in case of string. The filter will be called with arguments: $value, $params (parameters from the filtration rules), $form (current from object) and will return the filtered value.<br>
 **params** - array of parameters will be passed to the filter. The requirement depends on the called filter.
 
@@ -40,7 +40,7 @@ where:
 ```
 where:
 
-**field** - field name or array of fields<br>
+**field** - field name or field path (dot separated) or array of fields<br>
 **validator** - validator name. It can be a string or callable function. It can be a string or callable function. The Form will check method availability in the own object and if not exists then in validator objects array (validatorsObject) in case of string. The validator will be called with arguments: $value and $params (parameters from the filtration rules) and will return boolean.<br>
 **params** - array of parameters will be passed to the filter. The requirement depends on the called filter.<br>
 **message** - Message in case of error. Returns "error" by default or value from overridden the $defaultError property.
@@ -49,6 +49,7 @@ If the data field does not have any filtering or validation rules, it will be de
 ```php
 [
     ['name', 'string', ['min' => 3]],
+    ['data.nested.field', 'string', ['min' => 3]],
     ['age'], // this field is considered as safe
 ]
 ```
@@ -127,6 +128,7 @@ class MyForm1 extends \WebComplete\form\AbstractForm
             [['first_name', 'last_name'], 'capitalize'],
             ['description', 'stripTags'],
             ['content', 'stripJs'],
+            ['data.nested.field', 'trim'],
             ['email', 'replace', ['pattern' => 'email.com', 'to' => 'gmail.com']],
             ['*', 'trim'],
         ];
@@ -142,12 +144,19 @@ class MyForm1 extends \WebComplete\form\AbstractForm
             ['price', 'validatePrice'],
             ['password', 'required'],
             ['password_repeat', 'compare', ['field' => 'password'], 'Repeat password error'],
+            ['data.token', 'validateToken'],
             ['some', [SomeValidator::class, 'method'], ['customParam' => 100], 'Incorrect'],
             [['*'], 'regex', ['pattern' => '/^[a-z]$/'], 'Field is required'],
         ];
     }
     
     protected function validatePrice($value, $params, AbstractForm $form)
+    {
+        ...
+        return true;
+    }
+    
+    protected function validateToken($value, $params, AbstractForm $form)
     {
         ...
         return true;

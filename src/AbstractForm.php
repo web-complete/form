@@ -48,17 +48,17 @@ abstract class AbstractForm implements FormInterface
 
         $this->resetErrors();
         $this->validateRequired($definitions);
-        foreach ($this->getData() as $field => $value) {
-            if (isset($definitions[$field])) {
-                foreach ($definitions[$field] as $definition) {
-                    $defName = \array_shift($definition);
-                    $defParams = \array_merge([$value], [\array_shift($definition)], [$this]);
-                    $defMessage = \array_shift($definition) ?: $this->defaultError;
 
-                    if ($defName !== self::REQUIRED && !$this->isEmpty($value)
-                        && !$this->call($defName, $defParams, $this->validatorsObject, true)) {
-                        $this->addError($field, $defMessage);
-                    }
+        foreach ($definitions as $field => $fieldDefinitions) {
+            $value = $this->getValue($field);
+            foreach ($fieldDefinitions as $definition) {
+                $defName = \array_shift($definition);
+                $defParams = \array_merge([$value], [\array_shift($definition)], [$this]);
+                $defMessage = \array_shift($definition) ?: $this->defaultError;
+
+                if ($defName !== self::REQUIRED && !$this->isEmpty($value)
+                    && !$this->call($defName, $defParams, $this->validatorsObject, true)) {
+                    $this->addError($field, $defMessage);
                 }
             }
         }
@@ -94,7 +94,7 @@ abstract class AbstractForm implements FormInterface
      */
     public function getValue($field)
     {
-        return $this->data[$field] ?? null;
+        return $this->getDataValue($this->data, $field);
     }
 
     /**
@@ -110,7 +110,7 @@ abstract class AbstractForm implements FormInterface
             $data = $this->filter([$field => $value]);
             $value = $data[$field] ?? null;
         }
-        $this->data[$field] = $value;
+        $this->setDataValue($this->data, $field, $value);
     }
 
     /**
@@ -125,22 +125,33 @@ abstract class AbstractForm implements FormInterface
         $rulesDefinitions = $this->normalize($this->rules);
 
         foreach ($data as $field => $value) {
-            if (!isset($rulesDefinitions[$field]) && !isset($filtersDefinitions[$field])) {
+            if (!$this->hasKey($rulesDefinitions, $field) && !$this->hasKey($filtersDefinitions, $field)) {
                 unset($data[$field]);
                 continue;
             }
+        }
 
-            $fieldDefinitions = $filtersDefinitions[$field] ?? [];
-            if (isset($filtersDefinitions['*'])) {
+        if (isset($filtersDefinitions['*'])) {
+            foreach ($filtersDefinitions as $field => $fieldDefinitions) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
-                $fieldDefinitions = \array_merge($fieldDefinitions, $filtersDefinitions['*']);
+                $filtersDefinitions[$field] = \array_merge($fieldDefinitions, $filtersDefinitions['*']);
             }
+            foreach (\array_keys($rulesDefinitions) as $field) {
+                if ($field !== '*' && !isset($filtersDefinitions[$field])) {
+                    $filtersDefinitions[$field] = $filtersDefinitions['*'];
+                }
+            }
+            unset($filtersDefinitions['*']);
+        }
 
-            foreach ($fieldDefinitions as $definition) {
+        foreach ($filtersDefinitions as $field => $fieldDefinitions) {
+            $value = $this->getDataValue($data, $field);
+            foreach ((array)$fieldDefinitions as $definition) {
                 $defName = \array_shift($definition);
                 $defParams = \array_merge([$value], [\array_shift($definition)], [$this]);
-                $data[$field] = $this->call($defName, $defParams, $this->filtersObject, $value);
+                $value = $this->call($defName, $defParams, $this->filtersObject, $value);
             }
+            $this->setDataValue($data, $field, $value);
         }
 
         return $data;
@@ -165,7 +176,7 @@ abstract class AbstractForm implements FormInterface
         foreach ($definitions as $field => $fieldDefinitions) {
             foreach ($fieldDefinitions as $definition) {
                 if ($definition[0] === self::REQUIRED && $this->isEmpty($this->getValue($field))) {
-                    $this->addError($field, $definition[2] ?? $this->defaultError);
+                    $this->addError($field, !empty($definition[2]) ? $definition[2] : $this->defaultError);
                 }
             }
         }
@@ -224,5 +235,75 @@ abstract class AbstractForm implements FormInterface
         }
 
         return $callable ? \call_user_func_array($callable, $defParams) : $default;
+    }
+
+    /**
+     * @param array $array
+     * @param string $key
+     *
+     * @return bool
+     */
+    private function hasKey(array $array, string $key): bool
+    {
+        $keys = \array_keys($array);
+        foreach ($keys as $arrayKey) {
+            if ($arrayKey === $key || \strpos($arrayKey, $key . '.', 0) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $array
+     * @param $path
+     *
+     * @return mixed|null
+     */
+    private function getDataValue($array, $path)
+    {
+        $array = (array)$array;
+        if (\is_array($array) && (isset($array[$path]) || \array_key_exists($path, $array))) {
+            return $array[$path];
+        }
+
+        if (($pos = \strrpos($path, '.')) !== false) {
+            $array = $this->getDataValue($array, \substr($path, 0, $pos));
+            $path = (string)\substr($path, $pos + 1);
+        }
+
+        if (\is_array($array)) {
+            return (isset($array[$path]) || \array_key_exists($path, $array)) ? $array[$path] : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array $array
+     * @param $path
+     * @param $value
+     */
+    private function setDataValue(array &$array, $path, $value)
+    {
+        if ($path === null) {
+            $array = $value;
+            return;
+        }
+
+        $keys = \is_array($path) ? $path : \explode('.', $path);
+
+        while (\count($keys) > 1) {
+            $key = \array_shift($keys);
+            if (!isset($array[$key])) {
+                $array[$key] = [];
+            }
+            if (!\is_array($array[$key])) {
+                $array[$key] = [$array[$key]];
+            }
+            $array = &$array[$key];
+        }
+
+        $array[\array_shift($keys)] = $value;
     }
 }
