@@ -88,6 +88,7 @@ class Filters
         try {
             return preg_replace($pattern, $to, $value);
         } catch (\Exception $e) {
+            // ignore
         }
         return str_replace($pattern, $to, $value);
     }

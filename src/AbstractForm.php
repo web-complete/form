@@ -267,7 +267,8 @@ abstract class AbstractForm implements FormInterface
             return $array[$path];
         }
 
-        if (($pos = \strrpos($path, '.')) !== false) {
+        $pos = \strrpos($path, '.');
+        if ($pos !== false) {
             $array = $this->getDataValue($array, \substr($path, 0, $pos));
             $path = (string)\substr($path, $pos + 1);
         }

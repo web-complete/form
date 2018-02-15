@@ -12,7 +12,7 @@ trait TraitErrors
      */
     public function resetErrors($field = null)
     {
-        if ($field) {
+        if ($field !== null && $field) {
             unset($this->errors[$field]);
         } else {
             $this->errors = [];
@@ -48,7 +48,7 @@ trait TraitErrors
      */
     public function getErrors($field = null): array
     {
-        if ($field) {
+        if ($field !== null && $field) {
             return $this->errors[$field] ?? [];
         }
 
